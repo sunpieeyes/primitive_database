@@ -1,8 +1,8 @@
 {
-    "users": {
+    "products": {
         "ID": "int",
         "name": "str",
-        "age": "int",
-        "is_active": "bool"
+        "price": "int",
+        "in_stock": "bool"
     }
 }

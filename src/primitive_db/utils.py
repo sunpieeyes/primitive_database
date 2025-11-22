@@ -7,9 +7,11 @@ def load_metadata(filepath):
     """Загружает метаданные из JSON файла. Если файл не найден, возвращает пустой словарь."""
     try:
         with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            return data if isinstance(data, dict) else {}
     except FileNotFoundError:
         return {}
+
 
 def save_metadata(filepath, data):
     """Сохраняет метаданные в JSON файл."""
