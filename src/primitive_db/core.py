@@ -54,6 +54,9 @@ def list_tables(metadata):
 @handle_db_errors
 @log_time
 def insert(metadata, table_name, values, table_data):
+    if not isinstance(table_data, list):
+        table_data = []
+
     if table_name not in metadata:
         raise KeyError(table_name)
     schema = metadata[table_name]
@@ -78,6 +81,9 @@ def insert(metadata, table_name, values, table_data):
 @handle_db_errors
 @log_time
 def select(metadata, table_name, table_data, where_clause=None):
+    if not isinstance(table_data, list):
+        table_data = []
+
     if table_name not in metadata:
         raise KeyError(table_name)
 
@@ -111,6 +117,9 @@ def select(metadata, table_name, table_data, where_clause=None):
 @handle_db_errors
 @log_time
 def update(metadata, table_name, table_data, set_clause, where_clause):
+    if not isinstance(table_data, list):
+        table_data = []
+
     if table_name not in metadata:
         raise KeyError(table_name)
     updated_count = 0
@@ -132,6 +141,9 @@ def update(metadata, table_name, table_data, set_clause, where_clause):
 @confirm_action("удаление записи")
 @log_time
 def delete(metadata, table_name, table_data, where_clause):
+    if not isinstance(table_data, list):
+        table_data = []
+
     if table_name not in metadata:
         raise KeyError(table_name)
     new_data = [
@@ -149,6 +161,8 @@ def info(metadata, table_name):
     if table_name not in metadata:
         raise KeyError(table_name)
     table_data = load_table_data(table_name)
+    if not isinstance(table_data, list):
+        table_data = []
     schema = metadata[table_name]
     print(f"Таблица: {table_name}")
     cols_str = ", ".join(f"{k}:{v}" for k, v in schema.items())
