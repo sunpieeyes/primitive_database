@@ -1,10 +1,11 @@
-import json
 from prettytable import PrettyTable
-from .decorators import handle_db_errors, confirm_action, log_time, create_cacher
-from .utils import load_table_data, save_table_data
+
+from .decorators import confirm_action, create_cacher, handle_db_errors, log_time
+from .utils import load_table_data
 
 # Подключаем кэш
 cache = create_cacher()
+
 
 # -------------------
 # Работа с таблицами
@@ -22,8 +23,10 @@ def create_table(metadata, table_name, columns):
             raise ValueError(f'Некорректное значение: {typ}')
         schema[name] = typ
     metadata[table_name] = schema
-    print(f'Таблица "{table_name}" успешно создана со столбцами: {", ".join(f"{k}:{v}" for k,v in schema.items())}')
+    cols_str = ", ".join(f"{k}:{v}" for k, v in schema.items())
+    print(f'Таблица "{table_name}" успешно создана со столбцами: {cols_str}')
     return metadata
+
 
 @handle_db_errors
 @confirm_action("удаление таблицы")
@@ -34,6 +37,7 @@ def drop_table(metadata, table_name):
     print(f'Таблица "{table_name}" успешно удалена.')
     return metadata
 
+
 @handle_db_errors
 def list_tables(metadata):
     if not metadata:
@@ -42,6 +46,7 @@ def list_tables(metadata):
     for table in metadata:
         print(f"- {table}")
     return metadata
+
 
 # -------------------
 # CRUD операции
@@ -69,6 +74,7 @@ def insert(metadata, table_name, values, table_data):
     print(f'Запись с ID={new_id} успешно добавлена в таблицу "{table_name}".')
     return table_data
 
+
 @handle_db_errors
 @log_time
 def select(metadata, table_name, table_data, where_clause=None):
@@ -81,7 +87,11 @@ def select(metadata, table_name, table_data, where_clause=None):
         if cached_result:
             filtered = cached_result
         else:
-            filtered = [row for row in table_data if all(row.get(k) == v for k, v in where_clause.items())]
+            filtered = [
+                row
+                for row in table_data
+                if all(row.get(k) == v for k, v in where_clause.items())
+            ]
             cache(cache_key, lambda: filtered)
     else:
         filtered = table_data
@@ -96,6 +106,7 @@ def select(metadata, table_name, table_data, where_clause=None):
         table.add_row([row.get(f) for f in table.field_names])
     print(table)
     return filtered
+
 
 @handle_db_errors
 @log_time
@@ -116,16 +127,22 @@ def update(metadata, table_name, table_data, set_clause, where_clause):
     print(f"{updated_count} запись(и) успешно обновлена(ы) в таблице \"{table_name}\".")
     return table_data
 
+
 @handle_db_errors
 @confirm_action("удаление записи")
 @log_time
 def delete(metadata, table_name, table_data, where_clause):
     if table_name not in metadata:
         raise KeyError(table_name)
-    new_data = [row for row in table_data if not all(row.get(k) == v for k, v in where_clause.items())]
+    new_data = [
+        row
+        for row in table_data
+        if not all(row.get(k) == v for k, v in where_clause.items())
+    ]
     deleted_count = len(table_data) - len(new_data)
     print(f"{deleted_count} запись(и) успешно удалена(ы) из таблицы \"{table_name}\".")
     return new_data
+
 
 @handle_db_errors
 def info(metadata, table_name):
@@ -134,8 +151,10 @@ def info(metadata, table_name):
     table_data = load_table_data(table_name)
     schema = metadata[table_name]
     print(f"Таблица: {table_name}")
-    print(f"Столбцы: {', '.join(f'{k}:{v}' for k,v in schema.items())}")
+    cols_str = ", ".join(f"{k}:{v}" for k, v in schema.items())
+    print(f"Столбцы: {cols_str}")
     print(f"Количество записей: {len(table_data)}")
+
 
 # -------------------
 # Помощь

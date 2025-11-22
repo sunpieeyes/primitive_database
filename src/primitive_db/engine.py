@@ -1,23 +1,31 @@
 import shlex
+
 import prompt
-from .utils import load_metadata, save_metadata, load_table_data, save_table_data
+
 from .core import (
     create_table,
+    delete,
     drop_table,
-    list_tables,
+    info,
     insert,
+    list_tables,
+    print_help,
     select,
     update,
-    delete,
-    info,
-    print_help,
 )
-from .decorators import handle_db_errors, create_cacher
+from .decorators import create_cacher, handle_db_errors
+from .utils import (
+    load_metadata,
+    load_table_data,
+    save_metadata,
+    save_table_data,
+)
 
 METADATA_FILE = "db_meta.json"
 DATA_DIR = "data/"
 
 cache = create_cacher()
+
 
 def parse_where_clause(where_parts):
     key, val = " ".join(where_parts).split("=")
@@ -31,6 +39,7 @@ def parse_where_clause(where_parts):
         val = int(val)
     return {key: val}
 
+
 def parse_set_clause(set_parts):
     key, val = " ".join(set_parts).split("=")
     key = key.strip()
@@ -43,11 +52,11 @@ def parse_set_clause(set_parts):
         val = int(val)
     return {key: val}
 
+
 @handle_db_errors
 def run():
     print("*** Добро пожаловать в базу данных ***")
     metadata = load_metadata(METADATA_FILE) or {}
-
 
     while True:
         user_input = prompt.string(">>> Введите команду: ")
@@ -101,14 +110,25 @@ def run():
             set_clause = parse_set_clause(args[set_index:where_index])
             where_clause = parse_where_clause(args[where_index + 1:])
             table_data = load_table_data(table_name)
-            table_data = update(metadata, table_name, table_data, set_clause, where_clause) or table_data
+            table_data = update(
+                metadata,
+                table_name,
+                table_data,
+                set_clause,
+                where_clause,
+            ) or table_data
             save_table_data(table_name, table_data)
         elif command == "delete":
             table_name = args[2]
             where_index = args.index("where") + 1
             where_clause = parse_where_clause(args[where_index:])
             table_data = load_table_data(table_name)
-            table_data = delete(metadata, table_name, table_data, where_clause) or table_data
+            table_data = delete(
+                metadata,
+                table_name,
+                table_data,
+                where_clause,
+            ) or table_data
             save_table_data(table_name, table_data)
         elif command == "info":
             table_name = args[1]
