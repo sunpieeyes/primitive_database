@@ -20,7 +20,7 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone git@github.com:sunpieeyes/primitive_database.git
+git clone https://github.com/sunpieeyes/primitive_database
 cd project2_Shevchenko_Sergey
 
 2. Установите зависимости через poetry:
