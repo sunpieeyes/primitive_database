@@ -4,5 +4,11 @@
         "name": "str",
         "price": "int",
         "in_stock": "bool"
+    },
+    "users": {
+        "ID": "int",
+        "name": "str",
+        "age": "int",
+        "is_active": "bool"
     }
 }
